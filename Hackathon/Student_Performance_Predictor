@@ -1,0 +1,95 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.tree import DecisionTreeClassifier, plot_tree
+
+# Reproducible random data
+np.random.seed(42)
+
+n = 100
+
+attendance = np.random.randint(40, 101, n)
+assignments = np.random.randint(1, 11, n)
+internal = np.random.randint(15, 51, n)
+
+# More realistic decision logic
+result = []
+
+for a, ass, m in zip(attendance, assignments, internal):
+    score = 0
+
+    if a >= 85:
+        score += 2
+    elif a >= 70:
+        score += 1
+
+    if ass >= 8:
+        score += 2
+    elif ass >= 5:
+        score += 1
+
+    if m >= 40:
+        score += 2
+    elif m >= 30:
+        score += 1
+
+    # Add some randomness so the tree grows
+    score += np.random.choice([-1, 0, 1])
+
+    if score >= 4:
+        result.append("Pass")
+    else:
+        result.append("Fail")
+
+# Create DataFrame
+df = pd.DataFrame({
+    "Attendance": attendance,
+    "Assignments": assignments,
+    "InternalMarks": internal,
+    "Result": result
+})
+
+# Features & Target
+X = df[["Attendance", "Assignments", "InternalMarks"]]
+y = df["Result"]
+
+# Train Decision Tree
+model = DecisionTreeClassifier(
+    criterion="entropy",
+    max_depth=6,
+    random_state=42
+)
+
+model.fit(X, y)
+
+# Draw Tree
+plt.figure(figsize=(24, 14))
+
+plot_tree(
+    model,
+    feature_names=X.columns,
+    class_names=model.classes_,
+    filled=True,
+    rounded=True,
+    fontsize=9
+)
+
+plt.title("Student Performance Predictor Decision Tree", fontsize=18)
+plt.show()
+
+# Test Predictions
+test = pd.DataFrame({
+    "Attendance": [95, 82, 71, 65, 55],
+    "Assignments": [10, 7, 5, 3, 2],
+    "InternalMarks": [48, 38, 32, 25, 20]
+})
+
+pred = model.predict(test)
+
+print("\nPredictions")
+print("=" * 40)
+
+for i in range(len(test)):
+    print(f"\nStudent {i+1}")
+    print(test.iloc[i].to_dict())
+    print("Prediction:", pred[i])
