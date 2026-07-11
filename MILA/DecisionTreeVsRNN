@@ -1,0 +1,105 @@
+# ==========================================================
+# EXPERIMENT:
+# 1. Demonstrate Inductive Bias using a sample dataset
+# 2. Compare RNN and Decision Tree
+# ==========================================================
+
+import pandas as pd
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.preprocessing import LabelEncoder
+
+# ----------------------------------------------------------
+# Sample Dataset
+# ----------------------------------------------------------
+
+data = {
+    "Weather": ["Sunny", "Sunny", "Rainy", "Rainy", "Overcast", "Overcast"],
+    "Temperature": ["Hot", "Mild", "Cool", "Mild", "Hot", "Cool"],
+    "Play": ["No", "No", "Yes", "Yes", "Yes", "Yes"]
+}
+
+df = pd.DataFrame(data)
+
+print("========== SAMPLE DATASET ==========\n")
+print(df)
+
+# ----------------------------------------------------------
+# Encode Categorical Data
+# ----------------------------------------------------------
+
+encoder = LabelEncoder()
+
+df["Weather"] = encoder.fit_transform(df["Weather"])
+df["Temperature"] = encoder.fit_transform(df["Temperature"])
+df["Play"] = encoder.fit_transform(df["Play"])
+
+X = df[["Weather", "Temperature"]]
+y = df["Play"]
+
+# ----------------------------------------------------------
+# Train Decision Tree
+# ----------------------------------------------------------
+
+model = DecisionTreeClassifier(criterion="entropy", random_state=42)
+
+model.fit(X, y)
+
+accuracy = model.score(X, y)
+
+print("\n========== INDUCTIVE BIAS ==========\n")
+
+print("Training Accuracy :", accuracy)
+
+print("\nInductive Bias:")
+print("Decision Tree assumes that data can be")
+print("classified using feature-based rules")
+print("that maximize Information Gain.")
+
+# ----------------------------------------------------------
+# Compare RNN and Decision Tree
+# ----------------------------------------------------------
+
+comparison = pd.DataFrame({
+
+    "Feature":[
+        "Full Form",
+        "Data Type",
+        "Memory",
+        "Learning",
+        "Training Speed",
+        "Interpretability",
+        "Applications"
+    ],
+
+    "Decision Tree":[
+        "Decision Tree",
+        "Structured Data",
+        "No Memory",
+        "Rule-Based",
+        "Fast",
+        "Easy",
+        "Classification, Regression"
+    ],
+
+    "RNN":[
+        "Recurrent Neural Network",
+        "Sequential Data",
+        "Has Memory",
+        "Learns Temporal Patterns",
+        "Slower",
+        "Difficult",
+        "NLP, Speech, Time Series"
+    ]
+
+})
+
+print("\n========== RNN vs DECISION TREE ==========\n")
+
+print(comparison.to_string(index=False))
+
+print("\n========== CONCLUSION ==========")
+
+print("\nDecision Tree is suitable for structured/tabular data.")
+print("RNN is suitable for sequential or time-series data.")
+print("Decision Tree uses Information Gain to make decisions.")
+print("RNN remembers previous inputs through hidden states.")
