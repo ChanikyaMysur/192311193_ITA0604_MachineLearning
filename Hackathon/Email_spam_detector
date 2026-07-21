@@ -1,0 +1,89 @@
+# ==========================================================
+# EXPERIMENT:
+# Perceptron for Spam Email Classification
+# ==========================================================
+
+import pandas as pd
+from sklearn.linear_model import Perceptron
+from sklearn.preprocessing import LabelEncoder
+from sklearn.metrics import accuracy_score
+
+# ----------------------------------------------------------
+# Sample Dataset
+# ----------------------------------------------------------
+
+data = {
+    "Contains_Offer": ["Yes","Yes","No","Yes","No","No","Yes","No","Yes","No"],
+    "Contains_Free": ["Yes","No","No","Yes","No","No","Yes","No","Yes","No"],
+    "Contains_Link": ["Yes","Yes","No","Yes","No","Yes","Yes","No","Yes","No"],
+    "Spam": ["Yes","Yes","No","Yes","No","No","Yes","No","Yes","No"]
+}
+
+df = pd.DataFrame(data)
+
+print("========== EMAIL DATASET ==========\n")
+print(df)
+
+# ----------------------------------------------------------
+# Encode Categorical Data
+# ----------------------------------------------------------
+
+encoder = LabelEncoder()
+
+for column in df.columns:
+    df[column] = encoder.fit_transform(df[column])
+
+X = df[["Contains_Offer", "Contains_Free", "Contains_Link"]]
+y = df["Spam"]
+
+# ----------------------------------------------------------
+# Train Perceptron Model
+# ----------------------------------------------------------
+
+model = Perceptron(max_iter=1000, random_state=42)
+
+model.fit(X, y)
+
+# ----------------------------------------------------------
+# Training Accuracy
+# ----------------------------------------------------------
+
+prediction = model.predict(X)
+
+accuracy = accuracy_score(y, prediction)
+
+print("\n========== TRAINING RESULT ==========")
+print("Training Accuracy:", accuracy)
+
+# ----------------------------------------------------------
+# Test New Emails
+# ----------------------------------------------------------
+
+test = pd.DataFrame({
+    "Contains_Offer": [1, 0, 1, 0],
+    "Contains_Free":  [1, 0, 0, 1],
+    "Contains_Link":  [1, 1, 0, 0]
+})
+
+pred = model.predict(test)
+
+print("\n========== PREDICTION ==========\n")
+
+for i in range(len(test)):
+    label = "Spam" if pred[i] == 1 else "Not Spam"
+    print(f"Email {i+1}")
+    print(test.iloc[i].to_dict())
+    print("Prediction:", label)
+    print("-" * 35)
+
+# ----------------------------------------------------------
+# Model Parameters
+# ----------------------------------------------------------
+
+print("\n========== MODEL PARAMETERS ==========")
+print("Weights :", model.coef_)
+print("Bias    :", model.intercept_)
+
+print("\n========== CONCLUSION ==========")
+print("The Perceptron successfully classifies emails as Spam or Not Spam")
+print("based on the presence of Offer, Free, and Link keywords.")
